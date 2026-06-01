@@ -1,0 +1,60 @@
+﻿<view class="page">
+  <view class="top-area">
+    <view class="search-wrap">
+      <input
+        class="search-input"
+        placeholder="直接输入资产名称"
+        value="{{assetName}}"
+        bindinput="onInput"
+      />
+
+      <view wx:if="{{isLoading}}" class="state-line">查询中...</view>
+      <view wx:if="{{requestError}}" class="state-line warn">{{requestError}}</view>
+      <view wx:if="{{lastSource === 'remote'}}" class="state-line ok">当前结果来源：服务器</view>
+      <view wx:if="{{lastSource === 'local'}}" class="state-line">当前结果来源：本地兜底</view>
+
+      <view wx:if="{{matchStatus === 'single' || matchStatus === 'fuzzy'}}" class="match-box">
+        <view class="match-label">适合资产分类</view>
+        <view class="match-value">{{matchResult.fullName}}</view>
+        <view wx:if="{{matchResult.usefulLifeYears}}" class="life-line">使用年限：{{matchResult.usefulLifeYears}}年</view>
+      </view>
+
+      <view wx:elif="{{matchStatus === 'multi'}}" class="match-box">
+        <view class="match-label">适合资产分类（存在多个分类，请按备注选择）</view>
+        <view
+          wx:for="{{candidateResults}}"
+          wx:key="fullName"
+          class="candidate-item"
+          data-idx="{{index}}"
+          bindtap="onTapCandidate"
+        >
+          <view class="match-value">{{item.fullName}}</view>
+          <view wx:if="{{item.usefulLifeYears}}" class="life-line">使用年限：{{item.usefulLifeYears}}年</view>
+          <view wx:if="{{item.note}}" class="candidate-note">说明：{{item.note}}</view>
+          <view class="pick-tip">点此选用该分类</view>
+        </view>
+      </view>
+
+      <view wx:elif="{{assetName}}" class="match-box match-empty">
+        <view class="match-label">适合资产分类</view>
+        <view class="match-value">暂无匹配，请补充映射关系</view>
+        <view class="retry-btn" bindtap="onRetry">重试</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showFloatingArea}}" class="bottom-area">
+    <view class="float-canvas">
+      <view
+        wx:for="{{floatingNodes}}"
+        wx:key="id"
+        class="float-item"
+        style="{{item.style}}"
+        data-name="{{item.name}}"
+        bindtap="onTapFloatingAsset"
+      >
+        {{item.name}}
+      </view>
+    </view>
+  </view>
+</view>
